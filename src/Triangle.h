@@ -1,6 +1,5 @@
+#pragma once
 #include "Object.h"
-#ifndef __CLASS_TRIANGLE__
-#define __CLASS_TRIANGLE__
 class Triangle : public Object {
     vec3 v1;
     vec3 v2;
@@ -32,4 +31,3 @@ class Triangle : public Object {
         return false;
     }
 };
-#endif

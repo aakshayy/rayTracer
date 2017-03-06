@@ -1,6 +1,6 @@
+#pragma once
 #include "vec3.h"
-#ifndef __CLASS_OBJECT__
-#define __CLASS_OBJECT__
+#include "Material.h"
 class Object {
 public:
     vec3 color;
@@ -18,4 +18,3 @@ struct IntersectObject
 bool IntersectObjectCompare (IntersectObject a, IntersectObject b) {
     return (a.tValue < b.tValue);
 }
-#endif

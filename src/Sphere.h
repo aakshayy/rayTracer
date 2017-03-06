@@ -1,7 +1,6 @@
+#pragma once
 #include "Object.h"
 #include <math.h>
-#ifndef __CLASS_SPHERE__
-#define __CLASS_SPHERE__
 class Sphere : public Object {
     vec3 pos;
     float r;
@@ -24,4 +23,3 @@ class Sphere : public Object {
         return false;
     }
 };
-#endif

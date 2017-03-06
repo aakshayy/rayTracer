@@ -1,8 +1,6 @@
+#pragma once
 #include <math.h>
 //Simple Vector class
-#ifndef __CLASS_VEC3__
-#define __CLASS_VEC3__
-
 class vec3 {
     float e[3];
 public:
@@ -37,5 +35,3 @@ public:
         return (len != 0) ? vec3(e[0] / len, e[1] / len, e[2] / len) : vec3();
     }
 };
-
-#endif
