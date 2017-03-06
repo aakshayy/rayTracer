@@ -21,27 +21,49 @@ void writeColor(vec3 v) {
 }
 
 void loadObjects(std::vector<Object *> &objects) {
-    objects.push_back(new Sphere(vec3(0.5f, 0.2f, 0.5), 0.2f, vec3(1.0f, 1.0f, 0.0f)));
+    Material sphereMaterial(vec3(), vec3(1.0f, 1.0f, 0.0f), DIFFUSE);
+    Material leftWall(vec3(), vec3(0.75f, 0.25f, 0.25f), DIFFUSE);
+    Material rightWall(vec3(), vec3(0.25f, 0.75f, 0.25f), DIFFUSE);
+    Material plainWall(vec3(), vec3(0.75f, 0.75f, 0.75), DIFFUSE);
+
+    objects.push_back(new Sphere(vec3(0.5f, 0.2f, 0.5), 0.2f, sphereMaterial));
     
     //Cornell Box
     //LEFT FACE
-    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(0, 1, 1), vec3(0, 0, 1), vec3(0.5f, 0.0f, 0.0f)));
-    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(0, 1, 0), vec3(0, 1, 1), vec3(0.5f, 0.0f, 0.0f)));
+    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(0, 1, 1), vec3(0, 0, 1), leftWall));
+    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(0, 1, 0), vec3(0, 1, 1), leftWall));
     //RIGHT FACE
-    objects.push_back(new Triangle(vec3(1, 0, 0), vec3(1, 0, 1), vec3(1, 1, 1), vec3(0.0f, 0.5f, 0.0f)));
-    objects.push_back(new Triangle(vec3(1, 0, 0), vec3(1, 1, 1), vec3(1, 1, 0), vec3(0.0f, 0.5f, 0.0f)));
+    objects.push_back(new Triangle(vec3(1, 0, 0), vec3(1, 0, 1), vec3(1, 1, 1), rightWall));
+    objects.push_back(new Triangle(vec3(1, 0, 0), vec3(1, 1, 1), vec3(1, 1, 0), rightWall));
     //TOP FACE 
-    objects.push_back(new Triangle(vec3(1, 1, 0), vec3(1, 1, 1), vec3(0, 1, 1), vec3(0.7f, 0.7f, 0.7f)));
-    objects.push_back(new Triangle(vec3(1, 1, 0), vec3(0, 1, 1), vec3(0, 1, 0), vec3(0.7f, 0.7f, 0.7f)));
+    objects.push_back(new Triangle(vec3(1, 1, 0), vec3(1, 1, 1), vec3(0, 1, 1), plainWall));
+    objects.push_back(new Triangle(vec3(1, 1, 0), vec3(0, 1, 1), vec3(0, 1, 0), plainWall));
     //BACK FACE
-    objects.push_back(new Triangle(vec3(0, 0, 1), vec3(1, 1, 1), vec3(1, 0, 1), vec3(0.7f, 0.7f, 0.7f)));
-    objects.push_back(new Triangle(vec3(0, 0, 1), vec3(0, 1, 1), vec3(1, 1, 1), vec3(0.7f, 0.7f, 0.7f)));
+    objects.push_back(new Triangle(vec3(0, 0, 1), vec3(1, 1, 1), vec3(1, 0, 1), plainWall));
+    objects.push_back(new Triangle(vec3(0, 0, 1), vec3(0, 1, 1), vec3(1, 1, 1), plainWall));
     //BOTTOM FACE
-    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(1, 0, 1), vec3(1, 0, 0), vec3(0.7f, 0.7f, 0.7f)));
-    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(0, 0, 1), vec3(1, 0, 1), vec3(0.7f, 0.7f, 0.7f)));
+    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(1, 0, 1), vec3(1, 0, 0), plainWall));
+    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(0, 0, 1), vec3(1, 0, 1), plainWall));
     //FRONT FACE
-    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(1, 0, 0), vec3(1, 1, 0), vec3(0.7f, 0.7f, 0.7f)));
-    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(1, 1, 0), vec3(0, 1, 0), vec3(0.7f, 0.7f, 0.7f)));
+    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(1, 0, 0), vec3(1, 1, 0), plainWall));
+    objects.push_back(new Triangle(vec3(0, 0, 0), vec3(1, 1, 0), vec3(0, 1, 0), plainWall));
+}
+
+vec3 getShadeAtPixel(Ray &incidentRay, std::vector<Object *> &objects) {
+    vec3 color(0.0f, 0.0f, 0.0f); //set background to black
+    float tValue;
+    std::vector<IntersectObject> intersectedObjects;
+
+    for (unsigned int i = 0; i < objects.size(); i++) {
+        if(objects[i]->checkIntersection(incidentRay, 1, tValue)) {
+            intersectedObjects.push_back(IntersectObject(objects[i], tValue));
+        }
+    }
+    
+    if(intersectedObjects.size() > 0) {
+        color = intersectedObjects[0].object->material.color;
+    }
+    return color;
 }
 
 int main() {
@@ -50,8 +72,6 @@ int main() {
     std::cout << camera.getScreenWidth() << " " << camera.getScreenHeight() << "\n";
     std::cout << "255\n";
 
-    vec3 backgroundColor(0.0f, 0.0f, 0.0f); //set background to black
-    
     //width of each pixel
     float dx = (Camera::WIN_RIGHT_X - Camera::WIN_LEFT_X) / (camera.getScreenWidth());
     //height of each pixel
@@ -64,21 +84,8 @@ int main() {
     for (float h = camera.getScreenHeight() - 1; h >= 0; h--, y-= dy) {
         x = Camera::WIN_LEFT_X;
         for (float w = 0; w < camera.getScreenWidth(); w++, x+= dx) {
-            
-            vec3 color = backgroundColor;
-            float tValue;
-            std::vector<IntersectObject> intersectedObjects;
-            
-            for (unsigned int i = 0; i < objects.size(); i++) {
-                if(objects[i]->checkIntersection(camera.eye, vec3(x, y, 0) - camera.eye, 1, tValue)) {
-                    intersectedObjects.push_back(IntersectObject(objects[i], tValue));
-                }
-            }
-            
-            if(intersectedObjects.size() > 0) {
-                color = intersectedObjects[0].object->color;
-            }
-
+            Ray incidentRay(camera.eye, vec3(x, y, 0) - camera.eye);
+            vec3 color = getShadeAtPixel(incidentRay, objects);
             writeColor(color);
         }
         std::cout << "\n";

@@ -1,11 +1,12 @@
 #pragma once
 #include "vec3.h"
 #include "Material.h"
+#include "Ray.h"
 class Object {
 public:
-    vec3 color;
-    Object(vec3 _color): color(_color) {}
-    virtual bool checkIntersection(vec3 origin, vec3 incidentRay, float clipValue, float &tValue) = 0;
+	Material material;
+    Object(Material _material): material(_material) {}
+    virtual bool checkIntersection(Ray &incidentRay, float clipValue, float &tValue) = 0;
 };
 
 struct IntersectObject

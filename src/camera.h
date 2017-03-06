@@ -1,4 +1,5 @@
 #include "vec3.h"
+
 class Camera {
     unsigned int screenWidth;
     unsigned int screenHeight;
